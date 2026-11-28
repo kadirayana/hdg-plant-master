@@ -19,6 +19,8 @@ Sonra tarayıcıda `http://localhost:8000` adresini açın.
 ## Modlar
 
 **Kolay mod (animasyonlu):** Varsayılan mod.
+- Görev haritası: 7 görev, her biri kısa bir görsel dersle başlar ve 1–3 yıldızla puanlanır.
+- Görsel dersler: katman büyümesi, katodik koruma, kuru duvar, ön işlem zinciri, Sandelin etkisi, demir → dross zinciri, çinko dağılımı. Çoğu etkileşimlidir.
 - Dört seçimle tesisi kurarsınız: kapasite, tesis tipi, yerleşim şekli, donanım seviyesi.
 - Kazanı animasyonlu kesit üzerinde ergitirsiniz. İsterseniz otomatik operatör sizin yerinize yapar.
 - Üretim hattını izlersiniz. Banyolar renkli göstergelerle görünür, düzeltmek tek tık.
@@ -46,6 +48,8 @@ Sonra tarayıcıda `http://localhost:8000` adresini açın.
 | `tutorial.js` | Uzman mod rehberi ve mentör notları |
 | `anim.js` | Canvas animasyonları (üretim hattı, kazan kesiti) |
 | `simple.js` | Kolay mod ekranları |
+| `lessons.js` | Animasyonlu görsel dersler (canvas) |
+| `missions.js` | Görev haritası, hedefler ve yıldızlar |
 | `ui.js` | Uzman mod ekranları, izometrik görünüm, olay yönetimi |
 
 Oyun ilerlemesi tarayıcının `localStorage` alanına otomatik kaydedilir.

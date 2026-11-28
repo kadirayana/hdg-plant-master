@@ -17,12 +17,14 @@ function toast(t, lvl = 'info') {
 /* ---------------- shell ---------------- */
 function render() {
   renderChips(); renderTabs();
-  const v = (S.simple ? { epc: sEPC, comm: sComm, prod: sProd, enc: viewEnc } : { epc: viewEPC, comm: viewComm, prod: viewProd, enc: viewEnc })[S.mode] || viewEPC;
+  const v = (S.simple ? { map: viewMap, epc: sEPC, comm: sComm, prod: sProd, enc: viewEnc } : { epc: viewEPC, comm: viewComm, prod: viewProd, enc: viewEnc })[S.mode] || viewEPC;
   $('#view').innerHTML = v();
   animMount();
+  if (!S.simple && S.mode === 'map') S.mode = 'epc';
   renderHdr();
   tutUpdate();
   save();
+  setTimeout(checkMissions, 0);
 }
 function renderHdr() {
   $('#hdrb').innerHTML = `<div class="seg" role="group" aria-label="Oyun modu"><button class="btn sm ${S.simple ? 'primary' : ''}" data-act="hdr-mode" data-v="1">Kolay mod</button><button class="btn sm ${!S.simple ? 'primary' : ''}" data-act="hdr-mode" data-v="0">Uzman mod</button></div>${S.simple ? '' : `<button class="btn sm ${S.tut && S.tut.on ? 'primary' : ''}" data-act="hdr-tut" title="Eğitim rehberi">Rehber${S.tut && S.tut.on ? ' açık' : ''}</button>`}<button class="btn sm ghost" data-act="hdr-reset">${U.confirmReset ? 'Emin misiniz? Evet, sıfırla' : 'Yeni oyun'}</button>`;
@@ -45,7 +47,7 @@ function renderChips() {
   $('#chips').innerHTML = c.join('');
 }
 function renderTabs() {
-  const t = [['epc', '1', 'Tesis Kurulum & İnşaat (EPC)', true], ['comm', '2', 'Kazan Devreye Alma', S.epc.done], ['prod', '3', 'Günlük Üretim & Laboratuvar', !!S.prod], ['enc', '4', 'Teknik Ansiklopedi', true]];
+  const t = [...(S.simple ? [['map', '★', 'Görev haritası', true]] : []), ['epc', '1', 'Tesis Kurulum & İnşaat (EPC)', true], ['comm', '2', 'Kazan Devreye Alma', S.epc.done], ['prod', '3', 'Günlük Üretim & Laboratuvar', !!S.prod], ['enc', '4', 'Teknik Ansiklopedi', true]];
   $('#tabs').innerHTML = t.map(([m, k, l, en]) => `<button class="tab" role="tab" data-mode="${m}" aria-selected="${S.mode === m}" ${en ? '' : 'disabled'}><span class="k">${k}</span>${l}</button>`).join('');
 }
 
@@ -559,6 +561,7 @@ document.addEventListener('keydown', e => {
 function start(data) {
   S = (data && data.S && data.S.v === 4) ? data.S : (load() || newState());
   if (S.simple === undefined) S.simple = true;
+  msInit();
   if (S.comm && S.comm.A) S.comm.A.running = false;
   render();
   if (!S.tut) welcomeModal();

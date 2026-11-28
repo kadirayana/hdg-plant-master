@@ -84,7 +84,7 @@ document.addEventListener('click', e => {
   if (!t) return;
   e.stopPropagation();
   const st = TUT[S.tut?.i];
-  if (t.dataset.tutStart != null) { const v = t.dataset.tutStart; S.tut = { on: v === '1', i: 0 }; S.simple = v === 'e'; if (!S.simple && !S.epc.done) { S.epc.ch = defaultChoices(); S.epc.layout = { items: {} }; S.qs = null; } $('#modal').hidden = true; render(); return; }
+  if (t.dataset.tutStart != null) { const v = t.dataset.tutStart; S.tut = { on: v === '1', i: 0 }; S.simple = v === 'e'; if (S.simple) { S.mode = 'map'; $('#modal').hidden = true; render(); playLesson(MISSIONS[0], true); return; } if (!S.simple && !S.epc.done) { S.epc.ch = defaultChoices(); S.epc.layout = { items: {} }; S.qs = null; } $('#modal').hidden = true; render(); return; }
   if (t.dataset.tq != null) { const val = f => typeof f === 'function' ? f() : f; const i = +t.dataset.tq; const ok = i === val(st.quiz.a); S.tut.fb = { i, ok }; if (ok) S.tut.quizOk = (S.tut.quizOk || 0) + 1; tutUpdate(); save(); return; }
   if (t.dataset.tutGo != null) { tutGo(st); return; }
   if (t.dataset.tutNext != null || t.dataset.tutSkip != null) { S.tut.i++; S.tut.fb = null; const nx = TUT[S.tut.i]; if (nx && nx.go && !tutAt(nx) && !nx.check) tutGo(nx); else render(); return; }

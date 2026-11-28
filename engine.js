@@ -199,6 +199,7 @@ function commFinish(method) {
   let zinc = P.kT, wear = 0, note = '';
   if (method === 'A') { const A = S.comm.A; zinc = A.m; wear = A.dmg * 0.4; note = `${A.hr} saat, ${Math.round(A.gas).toLocaleString('tr-TR')} Nm³ gaz, kazan hasarı %${n(A.dmg, 0)}`; }
   else { wear = S.comm.B.report.dmg * 0.4; note = S.comm.B.report.summary; }
+  if (S.ms) S.ms.meltDmg = method === 'A' ? S.comm.A.dmg : S.comm.B.report.dmg;
   P.kettleWear = wear;
   S.comm.done = true;
   advanceDays(method === 'A' ? Math.max(1, Math.ceil(S.comm.A.hr / 24)) : 3);
@@ -654,7 +655,7 @@ function shipBatch(rework) {
   S.money += rev; S.pl.revenue += rev;
   spend(c.used / 1000 * zincPrice(), 'zinc');
   pr.stats.tons += o.tons; pr.stats.zinc += c.used / 1000; pr.stats.batches++; if (!o.defects.length) pr.stats.pass++; pr.stats.defects += o.defects.length;
-  pr.results.unshift({ id: o.id, cust: o.cust, prod: o.p.name, tons: o.tons, mean: o.qc.mean, pickup: c.pickup, defects: o.defects.length, crit: crit.length, rev, capa: capaTot ? `${capaOK}/${capaTot}` : '–', day: S.day });
+  pr.results.unshift({ id: o.id, cust: o.cust, prod: o.p.name, tons: o.tons, mean: o.qc.mean, pickup: c.pickup, defects: o.defects.length, crit: crit.length, rev, capa: capaTot ? `${capaOK}/${capaTot}` : '–', day: S.day, cls: o.cls, reactive: o.cls === 'peak' || o.cls === 'hyp', isoOk: o.qc.mean >= o.qc.iso.mean && o.qc.min >= o.qc.iso.local });
   if (pr.results.length > 40) pr.results.pop();
   logMsg(`Sevk: ${o.id} ${o.cust}, ${n(o.tons)} t, ort. ${n(o.qc.mean, 0)} µm, sarfiyat %${n(c.pickup, 2)}, gelir ${usd(rev)}.`, crit.length && !rework ? 'warn' : 'ok');
   pr.order = null; pr.stage = 'rfq';

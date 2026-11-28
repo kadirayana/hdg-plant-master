@@ -40,7 +40,7 @@ function sEPC() {
   const q = S.qs, C = CAP[q.cap], cost = epcCost(S.epc.ch), zf = S.plant ? 0 : kettleTonnes(C) * zincPrice(), rest = C.budget - cost - zf;
   const card = (grp, v, title, body, extra = '') => `<button class="qcard ${q[grp] === v ? 'on' : ''}" data-qs="${grp}" data-v="${v}" aria-pressed="${q[grp] === v}">${extra}<b>${title}</b><span>${body}</span></button>`;
   return `<div class="col">
-    <div class="panel intro"><h2>Galvaniz tesisini kur</h2><p class="muted">Dört seçim yapın, tesis kendini inşa etsin. Ayrıntıları değiştirmek isterseniz üstteki <b>Uzman mod</b> düğmesine geçebilirsiniz.</p></div>
+    ${missionBanner()}<div class="panel intro"><h2>Galvaniz tesisini kur</h2><p class="muted">Dört seçim yapın, tesis kendini inşa etsin. Ayrıntıları değiştirmek isterseniz üstteki <b>Uzman mod</b> düğmesine geçebilirsiniz.</p></div>
     <div class="panel"><h3>1 · Kapasite</h3><div class="qgrid" style="margin-top:10px">
       ${card('cap', 'small', 'Küçük · 15.000 t/yıl', `Kazan 7 m · bütçe ${usd(CAP.small.budget)}`)}${card('cap', 'medium', 'Orta · 35.000 t/yıl', `Kazan 12 m · bütçe ${usd(CAP.medium.budget)}`)}${card('cap', 'heavy', 'Ağır · 70.000 t/yıl', `Kazan 15 m · bütçe ${usd(CAP.heavy.budget)}`)}</div></div>
     <div class="panel"><h3>2 · Tesis tipi ${I('conveyor')}</h3><div class="qgrid" style="margin-top:10px">
@@ -62,7 +62,7 @@ function sComm() {
   if (S.comm.method !== 'A') S.comm.method = 'A';
   const A = S.comm.A;
   const pw = [[35, 'Kısık'], [55, 'Orta'], [75, 'Güçlü'], [100, 'Tam']];
-  return `<div class="col"><div class="panel intro"><h2>Kazanı ilk kez ergit</h2><p class="muted">Külçeleri atın, ateşi ayarlayın. <b>Kural:</b> kazan boşken duvar 420 °C’yi geçmesin, yoksa sac hasar görür. Emin değilseniz <b>Otomatik operatör</b> sizin yerinize yapsın, siz izleyip öğrenin.</p></div>
+  return `<div class="col">${missionBanner()}<div class="panel intro"><h2>Kazanı ilk kez ergit</h2><p class="muted">Külçeleri atın, ateşi ayarlayın. <b>Kural:</b> kazan boşken duvar 420 °C’yi geçmesin, yoksa sac hasar görür. Emin değilseniz <b>Otomatik operatör</b> sizin yerinize yapsın, siz izleyip öğrenin.</p></div>
    <div class="panel" style="padding:8px"><canvas id="s-kettle" class="anim" aria-label="Kazan kesiti animasyonu"></canvas></div>
    <div class="panel"><div class="row" style="justify-content:space-between;gap:12px">
      <div class="row"><span class="small"><b>Ateş</b></span>${pw.map(([v, t]) => `<button class="btn ${A.power === v ? 'primary' : ''}" data-act="s-pow" data-v="${v}">${t}</button>`).join('')}</div>
@@ -150,8 +150,8 @@ const FIX_TXT = { degrease: 'Yağ alma kartından kimyasal ekleyin, yağı sıy�
 const PNAME = { hea: 'Kiriş', rhs: 'Kutu profil', pole: 'Direk', angle: 'Köşebent', guard: 'Bariyer', grat: 'Izgara', plate: 'Ağır plaka', bolt: 'Cıvata', tray: 'Kablo tavası' };
 
 function sProd() {
-  const pr = S.prod; fillRFQs();
-  return `<div class="col"><div class="panel" style="padding:8px"><div class="animwrap"><canvas id="s-line" class="anim" aria-label="Üretim hattı animasyonu"></canvas></div>
+  const pr = S.prod; fillRFQs(); forceReactive();
+  return `<div class="col">${missionBanner()}<div class="panel" style="padding:8px"><div class="animwrap"><canvas id="s-line" class="anim" aria-label="Üretim hattı animasyonu"></canvas></div>
      <div class="row" style="justify-content:space-between;margin-top:6px"><span class="small muted">Tanka tıklayıp bilgi almak için alttaki kartlardaki <b>i</b> düğmelerini kullanın.</span><span class="row"><span class="small">Hız</span>${[1, 2, 4].map(v => `<button class="btn sm ${AN.speed === v ? 'primary' : ''}" data-act="s-speed" data-v="${v}">${v}×</button>`).join('')}</span></div></div>
    <div class="layout"><div class="col"><div class="panel" id="s-ctx">${sCtx()}</div></div><div class="col"><div class="panel"><div class="ph"><h4>Banyo durumu</h4><span class="small muted">canlı sensör</span></div>${healthHTML()}</div></div></div></div>`;
 }
@@ -202,7 +202,8 @@ function resultHTML() {
   const o = SU.result, c = o.coat, q = o.qc, iso = q.iso, ok = q.mean >= iso.mean && q.min >= iso.local, crit = o.defects.some(x => x.sev === 'crit' && x.id !== 'explode');
   const mx = Math.max(220, q.mean * 1.3), pct = v => Math.min(100, v / mx * 100);
   const look = c.eta < 4 ? ['Mat gri', '#9ea4a8'] : ['Parlak gümüş', '#d5dde2'];
-  return `<h3>Parti tamamlandı</h3>
+  const bs = batchStars({ isoOk: ok, defects: o.defects.length, crit: o.defects.some(x => x.sev === 'crit') });
+  return `<div class="row" style="justify-content:space-between"><h3>Parti tamamlandı</h3>${starsHTML(bs)}</div><div class="small muted">★ ISO 1461 · ★★ kritik kusur yok · ★★★ kusursuz</div>
    <div class="row" style="gap:14px;margin-top:8px"><span class="swatch" style="background:${look[1]}"></span><div><b>${look[0]}</b><div class="small muted">${n(c.alloy, 0)} µm alaşım + ${n(c.eta, 0)} µm saf çinko</div></div></div>
    <div style="margin-top:12px"><div class="row" style="justify-content:space-between"><span class="small">Kaplama kalınlığı</span><span class="mono"><b>${n(q.mean, 0)} µm</b> · ISO 1461 en az ${iso.mean} µm</span></div>
      <div class="track big"><i class="fill ${ok ? 'ok' : 'crit'}" style="width:${pct(q.mean)}%"></i><i class="line" style="left:${pct(iso.mean)}%"></i></div>
@@ -282,7 +283,7 @@ document.addEventListener('click', e => {
     case 's-pow': A.power = +t.dataset.v; SU.caption = ''; break;
     case 's-ing': commAddIngot(t.dataset.v === 's' ? 'side' : 'center'); dropIngot(t.dataset.v === 's'); SU.caption = ''; const l = $('#s-live'); if (l) l.innerHTML = sCommLive(); renderChips(); return;
     case 's-play': SU.playing = !SU.playing; break;
-    case 's-auto': SU.auto = !SU.auto; if (SU.auto) { SU.playing = true; SU.caption = 'Otomatik operatör devrede. İzleyin: her kararı burada açıklayacak.'; } break;
+    case 's-auto': SU.auto = !SU.auto; if (SU.auto) { msInit().autoUsed = true; SU.playing = true; SU.caption = 'Otomatik operatör devrede. İzleyin: her kararı burada açıklayacak.'; } break;
     case 's-commdone': SU.playing = false; SU.auto = false; commFinish('A'); S.mode = 'prod'; SU.st = 'pick'; toast('Kazan devrede. İlk iş: Kazan kartında “Alaşımla”.', 'ok'); break;
     case 's-speed': AN.speed = +t.dataset.v; break;
     case 's-take': sTake(+t.dataset.i); break;
@@ -293,3 +294,10 @@ document.addEventListener('click', e => {
   }
   render();
 }, true);
+
+/* mission 5 needs a reactive-steel order on the board */
+function forceReactive() {
+  const m = typeof curMission === 'function' && curMission(); if (!m || m.id !== 'reactive' || !S.prod || S.prod.order) return;
+  if (S.prod.rfqs.some(q => q.cls === 'peak' || q.cls === 'hyp')) return;
+  for (let i = 0; i < 80; i++) { const q = genRFQ(); if (q.cls === 'peak' || q.cls === 'hyp') { S.prod.rfqs[0] = q; return; } }
+}
